@@ -1,87 +1,87 @@
-# Liqwid Finance Documentation
+# Liqwid Finance - Open Source Documentation
 
-Open source documentation for interacting with [Liqwid Finance](https://liqwid.finance/) — Cardano's leading DeFi lending protocol.
+Community-driven documentation for [Liqwid Finance](https://liqwid.finance), the largest DeFi lending protocol on Cardano.
 
-## 📚 Documentation
+> ⚠️ **Work in Progress** - This documentation is being reverse-engineered from on-chain data and open source components. Not affiliated with Liqwid Labs.
 
-| Doc | Description |
-|-----|-------------|
-| [Overview](docs/overview.md) | Protocol architecture and key concepts |
-| [qTokens](docs/qtokens.md) | Understanding receipt tokens and exchange rates |
-| [Supply](docs/supply.md) | Deposit assets → Receive qTokens |
-| [Withdraw](docs/withdraw.md) | Burn qTokens → Receive underlying + interest |
-| [Conversion](docs/conversion.md) | qToken ↔ underlying math (from source) |
+## Overview
 
-## 🎯 Goal
+Liqwid is a lending protocol where:
+- **Suppliers** deposit assets (ADA, USDA, etc.) and receive qTokens representing their position
+- **Borrowers** use collateral to take loans, paying interest to suppliers
+- **Liquidators** close unhealthy positions, earning a bonus
 
-Provide clear, developer-friendly documentation for:
-- ✅ How qTokens work
-- ✅ Deposit flow (supply assets, mint qTokens)
-- ✅ Withdraw flow (burn qTokens, receive underlying)
-- 🚧 Code examples (Python, TypeScript)
-- 🚧 Full datum/redeemer specifications
+## Documentation
 
-## 🏗️ Structure
+### Core Concepts
+- [**Supply/Redeem Flow**](./docs/supply-redeem.md) ✅ - Complete MeshJS guide
+- [**Market Registry**](./docs/market-registry.md) ✅ - All markets with script hashes
+- [qTokens Explained](./docs/qtokens.md) *(coming soon)*
+- [Interest Rates](./docs/interest-rates.md) *(coming soon)*
 
-```
-liqwid-docs/
-├── README.md
-├── registry.json               # Liqwid v5 contract registry
-├── docs/
-│   ├── overview.md             # ✅ Protocol overview
-│   ├── qtokens.md              # ✅ qToken mechanics
-│   ├── supply.md               # ✅ Supply/deposit guide
-│   └── withdraw.md             # ✅ Withdraw guide
-├── examples/
-│   ├── python/                 # 🚧 PyCardano examples
-│   └── typescript/             # 🚧 Lucid/MeshJS examples
-└── research/
-    ├── protocol-analysis.md    # On-chain research notes
-    └── ada-market-mainnet.md   # ADA market script addresses
-```
+### Technical Reference
+- [ActionDatum Structure](./research/action-datum-structure.md)
+- [MarketState Structure](./research/market-state-structure.md)
+- [UTxO Relationships](./research/utxo-relationships.md)
 
-## 🔑 Key Contract Addresses (ADA Market - Mainnet)
+### SDK
+- [MeshJS Supply/Withdraw](./sdk/liqwid-supply.ts) - Working TypeScript implementation
 
-| Component | Script Hash |
-|-----------|-------------|
-| **qADA Policy** | `a04ce7a52545e5e33c2867e148898d9e667a69602285f6a1298f9d68` |
-| MarketState | `8d258b9d08dcab73f3165a11751d464b46056264091c1789da588726` |
-| MarketState Token | `5a3cb4f52fb3a00ab5abe62080618623811ccafab9c760d0b686e44c` |
-| Action | `31415bb210164cf6b84d1b12537f0792d2912d156e0f1ed1d91c83ce` |
-| Batch | `a3e56ea9d2db008038ce6fb32e500faef1523dcb042e5a637d633fc8` |
+### On-Chain Data
+- [Registry (v5)](./registry.json) - All market addresses, tokens, and script hashes
 
-Full registry: [registry.json](registry.json) or https://public.liqwid.finance/v5/registry.json
+## Quick Start
 
-## 📖 Quick Reference
+### Read the qTokenRate (Python + Blockfrost)
+```python
+import requests
+from pycardano import PlutusData
 
-### Supply (Deposit)
-```
-1. Find Action UTxO
-2. Read MarketState → get qTokenRate
-3. Calculate: qTokens = deposit / qTokenRate
-4. Build TX: deposit → Action, mint qTokens
-5. Wait for batch processing
+BLOCKFROST_KEY = "your_key"
+MARKET_STATE_ADDR = "addr1w8..."  # From registry.json
+
+# Query MarketState UTxO
+utxos = requests.get(
+    f"https://cardano-mainnet.blockfrost.io/api/v0/addresses/{MARKET_STATE_ADDR}/utxos",
+    headers={"project_id": BLOCKFROST_KEY}
+).json()
+
+# Find UTxO with MarketState token and decode inline datum
+# qTokenRate is field index 9 (Ratio of two BigInts)
 ```
 
-### Withdraw
+### Calculate APY
+```python
+def calculate_supply_apy(market_state):
+    """
+    Supply APY = (qTokenRate_now / qTokenRate_year_ago - 1) * 100
+    
+    Or estimate from utilization + interest model
+    """
+    utilization = market_state['principal'] / (market_state['supply'] + market_state['principal'])
+    # Apply interest model curve...
 ```
-1. Find Action UTxO  
-2. Read MarketState → get qTokenRate
-3. Calculate: underlying = qTokens × qTokenRate
-4. Build TX: burn qTokens, receive underlying
-5. Wait for batch processing
-```
 
-## 🛠️ Data Sources
+## Contributing
 
-- **Contract Registry**: https://public.liqwid.finance/v5/registry.json
-- **Official Docs**: https://docs.liqwid.finance/
-- **Liqwid Labs GitHub**: https://github.com/Liqwid-Labs
+This is a community effort! Help wanted:
+- [ ] Document supply transaction flow
+- [ ] Document borrow transaction flow
+- [ ] Add liquidation mechanics
+- [ ] Create example transactions
+- [ ] Build Python/TypeScript SDK snippets
 
-## 📝 Contributing
+## Resources
 
-Open source under MIT license. PRs welcome.
+- [Liqwid App](https://app.liqwid.finance)
+- [Liqwid Docs (Official)](https://docs.liqwid.finance) - High-level overview
+- [Liqwid GitHub](https://github.com/Liqwid-Labs) - Some SDK code
+- [Agora Governance](https://agora.liqwid.finance) - DAO proposals
+
+## License
+
+MIT - Documentation is free for anyone to use and contribute to.
 
 ---
 
-Built by [@ClawdanoAI](https://x.com/ClawdanoAI) 🐙
+*Built with 🐙 by the Cardano community*
