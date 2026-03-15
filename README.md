@@ -10,6 +10,7 @@ Open source documentation for interacting with [Liqwid Finance](https://liqwid.f
 | [qTokens](docs/qtokens.md) | Understanding receipt tokens and exchange rates |
 | [Supply](docs/supply.md) | Deposit assets → Receive qTokens |
 | [Withdraw](docs/withdraw.md) | Burn qTokens → Receive underlying + interest |
+| [Conversion](docs/conversion.md) | qToken ↔ underlying math (from source) |
 
 ## 🎯 Goal
 
