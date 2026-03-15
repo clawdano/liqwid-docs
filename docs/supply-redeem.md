@@ -305,17 +305,93 @@ const buildWithdrawTx = async (wallet: MeshWallet, qTokensToBurn: bigint) => {
 
 ---
 
-## Live Example
+## Live Transaction Examples
 
+### Supply (Deposit) - Real Mainnet TX
+
+**TX Hash:** `08b82a63266ff8d4f592e4cd074243f7a117d12cc54f79b00524d943aad801a7`
+
+[View on CardanoScan](https://cardanoscan.io/transaction/08b82a63266ff8d4f592e4cd074243f7a117d12cc54f79b00524d943aad801a7)
+
+**ActionDatum BEFORE (CBOR hex):**
 ```
-Deposit Flow:
-  Before ActionDatum: supplyDiff=0, qTokensDiff=0
-  After ActionDatum:  supplyDiff=+40,875 ADA, qTokensDiff=+1.9T qTokens
-  
-  User deposited ~40,875 ADA
-  User received ~1.9T qTokens
-  Action UTxO ADA increased by deposit amount
+9f9f0000000000ff1a1d708490ff
 ```
+Decoded:
+```json
+{
+  "actionValue": {
+    "supplyDiff": 0,
+    "qTokensDiff": 0,
+    "principalDiff": 0,
+    "interestDiff": 0,
+    "extraInterestRepaid": 0
+  },
+  "reservedSupply": 494822544
+}
+```
+
+**ActionDatum AFTER (CBOR hex):**
+```
+9f9f1b00000009845a5e181b000001c2b3bbc16e000000ff1a1d708490ff
+```
+Decoded:
+```json
+{
+  "actionValue": {
+    "supplyDiff": 40875220504,      // +40,875.22 ADA
+    "qTokensDiff": 1935750709614,   // +1.9T qTokens minted
+    "principalDiff": 0,
+    "interestDiff": 0,
+    "extraInterestRepaid": 0
+  },
+  "reservedSupply": 494822544
+}
+```
+
+**MarketState qTokenRate (at time of TX):**
+```
+qTokenRate = [33220771660819, 1573254688866635]
+           = 0.0211159527 ADA per qToken
+           ≈ 47.36 qTokens per ADA
+```
+
+**Verification:**
+```typescript
+const depositLovelace = 40_875_220_504n;
+const qTokenRate = [33220771660819n, 1573254688866635n];
+
+// qTokens = deposit * rate[1] / rate[0]
+const qTokensToMint = (depositLovelace * qTokenRate[1]) / qTokenRate[0];
+// = 1,935,750,709,614 ✓ (matches on-chain)
+```
+
+**What Happened:**
+1. User deposited **40,875.22 ADA** into the Action UTxO
+2. Protocol minted **1,935,750,709,614 qTokens** to user
+3. ActionDatum updated with positive `supplyDiff` and `qTokensDiff`
+4. Action UTxO value increased by 40,875.22 ADA
+
+---
+
+### Redeem (Withdraw) - Expected Pattern
+
+For withdrawals, the datum changes are **negative**:
+
+```json
+{
+  "actionValue": {
+    "supplyDiff": -10000000000,     // -10,000 ADA leaving
+    "qTokensDiff": -473575600000,   // qTokens being burned
+    "principalDiff": 0,
+    "interestDiff": 0,
+    "extraInterestRepaid": 0
+  },
+  "reservedSupply": 494822544
+}
+```
+
+And qTokens are **burned** (negative mint amount in the transaction).
 
 ---
 
