@@ -53,3 +53,38 @@
    - Output: ADA to user (amount = qADA * qTokenRate)
    - Output: Updated Action UTxO
 4. Submit & wait for batch processing
+
+## Live Data (March 2026)
+
+### Current qTokenRate
+```
+qTokenRate: 0.0211159449 (Ratio 33330147111468/1578435026865641)
+
+1 ADA = 47.36 qADA
+1 qADA = 0.021116 ADA
+```
+
+### Example Withdraw TX
+TX: `6dca4845faf14bf037f14f4f6bd4f039475f4a3736a59c436b43e9777bdb6d53`
+
+```
+User burned:   1,919,945,862,993 qADA (raw lovelace units)
+User received: 40,541.47 ADA
+
+Calculation: 1,919,945.86 × 0.021116 = 40,541.47 ADA ✓
+```
+
+### MarketState Datum Fields
+```
+[0]: interest (accumulated)
+[1]: interestIndex
+[2]: interestRate
+[3]: lastBatch (timestamp)
+[4]: lastInterestTime
+[5]: minAda
+[6]: principal (Ratio)
+[7]: qTokens (total minted)
+[8]: (field 8)
+[9]: qTokenRate (Ratio) ← THIS IS THE EXCHANGE RATE
+[10]: supply
+```

@@ -22,30 +22,29 @@ The **qTokenRate** (exchange rate) determines how much underlying each qToken is
 
 ### Rate Only Increases
 
-The qTokenRate **never decreases**. It starts at ~1.0 and grows as:
+The qTokenRate **never decreases**. It starts small (e.g., ~0.02) and grows as:
 1. Borrowers pay interest
 2. Protocol fees are deducted
 3. Remaining interest accrues to suppliers
 
-### Example: ADA Market
+### Example: ADA Market (Live Data)
 
 ```
-Initial state:
-  Supply: 1,000,000 ADA
-  qTokens: 1,000,000 qADA
-  qTokenRate: 1.0
-
-After 1 year (5% APY):
-  Supply: 1,050,000 ADA (interest accrued)
-  qTokens: 1,000,000 qADA (unchanged)
-  qTokenRate: 1.05
+Current state (March 2026):
+  qTokenRate: 0.0211159449
+  
+  1 ADA = 47.36 qADA
+  1 qADA = 0.021116 ADA
 ```
 
-If you hold 100 qADA:
-- Initially worth: 100 ADA
-- After 1 year: 105 ADA
+**Example transaction:**
+- User burned: 1,919,945.86 qADA
+- Received: 40,541.47 ADA
+- Calculation: 1,919,945.86 × 0.021116 = 40,541.47 ✓
 
-**You earn interest by simply holding qTokens.**
+**You earn interest by simply holding qTokens** — the rate increases over time.
+
+> **Note**: Unlike some protocols where rate ≈ 1.0, Liqwid uses Compound-style rates starting small (~0.02) and growing.
 
 ## qToken Rate Formula
 
